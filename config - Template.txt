@@ -1,0 +1,30 @@
+[login]
+server_name = 
+version = 
+site_url_name = 
+user_name = 
+password = 
+personal_access_token_name = 
+personal_access_token_secret = 
+use_pat_flag = True
+
+
+[datasource]
+datasource_name = Sample - Superstore Datasource
+
+[workbook]
+workbook_name = TUG WB: Profit & Sales by Quarter
+filter_key_1 = Category
+filter_value_1 = Furniture
+filter_key_2 = Category
+filter_value_2 = Technology
+output_file_name = download_content.pdf
+
+[group]
+group_name = TUG Group
+group_user_name = 
+
+[db]
+current_db_username = 
+db_username = wrongUsername
+db_password = 
