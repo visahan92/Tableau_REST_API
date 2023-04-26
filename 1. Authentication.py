@@ -42,8 +42,8 @@ else:
 	}
 
 # Send the request to the server
-req = requests.post(signin_url, json=payload, headers=headers, verify=False)
-req.rais_efor_status()
+req = requests.post(signin_url, json=payload, headers=headers)
+req.raise_for_status()
 
 # Get the response
 response = json.loads(req.content)
@@ -64,7 +64,7 @@ headers['X-tableau-auth']=token
 # Sign out
 signout_url = "https://{server}/api/{version}/auth/signout".format(server=server_name, version=version)
 
-req = requests.post(signout_url, data=b'', headers=headers, verify=False)
+req = requests.post(signout_url, headers=headers)
 req.raise_for_status()
 
 print('Sign out successful!')
