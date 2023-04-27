@@ -25,13 +25,15 @@ filter_value_2 = config.get('workbook', 'filter_value_2')
 tableau_auth = TSC.PersonalAccessTokenAuth(personal_access_token_name, personal_access_token_secret, site_url_id)
 server = TSC.Server(server_name, use_server_version=True)
 
-req_option = TSC.RequestOptions()
-req_option.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
+# 1. Authenticate
+with server.auth.sign_in(tableau_auth):
+
+    req_option = TSC.RequestOptions()
+    req_option.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
                                  TSC.RequestOptions.Operator.Equals,
                                  workbook_name))
 
-with server.auth.sign_in(tableau_auth):
-
+    # 2. Get Workbook
     workbooks, pagination = server.workbooks.get(req_option)
     workbook_retrieved =  ''
     view_retrieved =  ''
@@ -40,22 +42,29 @@ with server.auth.sign_in(tableau_auth):
 
     server.workbooks.populate_views(workbook_retrieved)
 
+    # 3. Get View
     for view in workbook_retrieved.views:
         view_retrieved = view
 
+    # 4. Add Filter
     option_factory = getattr(TSC, "PDFRequestOptions")
     options = option_factory().vf(filter_key_1,filter_value_1)
 
     server.views.populate_image(view_retrieved,options)
+
+    # 5. Download Image
     filename = output_file_name + "-image-export.png"
     with open(filename, "wb") as f:
         f.write(view_retrieved.image)
     print("Image saved as " + filename)
 
+    # 6. Add Filter
     option_factory = getattr(TSC, "PDFRequestOptions")
     options = option_factory().vf(filter_key_2,filter_value_2)
 
     server.views.populate_pdf(view_retrieved,options)
+
+    # 7. Download PDF
     with open(output_file_name, 'wb') as f:
         f.write(view_retrieved.pdf)
     print("PDF saved as " + output_file_name)

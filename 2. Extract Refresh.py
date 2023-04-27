@@ -13,25 +13,31 @@ version = config.get('login', 'version')     # API version of your server
 site_url_id = config.get('login', 'site_url_name')    # Site (subpath) to sign in to. An empty string is used to specify the default site.
 
 # For Personal Access Token sign in
-personal_access_token_name = config.get('login', 'personal_access_token_name')         # Name of the personal access token.
+personal_access_token_name = config.get('login', 'personal_access_token_name')       # Name of the personal access token.
 personal_access_token_secret = config.get('login', 'personal_access_token_secret')   # Value of the token.
 datasource_name = config.get('datasource', 'datasource_name')
 
 tableau_auth = TSC.PersonalAccessTokenAuth(personal_access_token_name, personal_access_token_secret, site_url_id)
 server = TSC.Server(server_name, use_server_version=True)
 
-req_option = TSC.RequestOptions()
-req_option.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
+
+# 1. Authenticate
+with server.auth.sign_in(tableau_auth):
+
+    req_option = TSC.RequestOptions()
+    # Filter options
+    req_option.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
                                  TSC.RequestOptions.Operator.Equals,
                                  datasource_name))
 
-with server.auth.sign_in(tableau_auth):
+    # 2. Get datasource by filtering on all datasources by name
     datasources, pagination = server.datasources.get(req_option)
     datasource_retrieved = ''
 
     for datasource in datasources:
         datasource_retrieved = datasource
 
+    # 3. Refresh the datasource
     result = server.datasources.refresh(datasource_retrieved)
 
     progress = '0'

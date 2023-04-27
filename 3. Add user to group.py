@@ -20,35 +20,40 @@ group_user_name = config.get('group', 'group_user_name')
 tableau_auth = TSC.PersonalAccessTokenAuth(personal_access_token_name, personal_access_token_secret, site_url_id)
 server = TSC.Server(server_name, use_server_version=True)
 
-req_option = TSC.RequestOptions()
-req_option.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
+# 1. Authenticate
+with server.auth.sign_in(tableau_auth):
+
+    req_group_by_name = TSC.RequestOptions()
+    req_group_by_name.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
                                  TSC.RequestOptions.Operator.Equals,
                                  group_name))
 
-req_option2 = TSC.RequestOptions()
-req_option2.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
+    req_group_by_user_name = TSC.RequestOptions()
+    req_group_by_user_name.filter.add(TSC.Filter(TSC.RequestOptions.Field.Name,
                                  TSC.RequestOptions.Operator.Equals,
                                  group_user_name))
-
-with server.auth.sign_in(tableau_auth):
+    
     group_receieved = ''
     user_receieved = ''
-    all_groups, pagination_item = server.groups.get(req_option)
+
+    # 2. Get Group
+    all_groups, pagination_item = server.groups.get(req_group_by_name)
     for group in all_groups:
         print('Group Name : ' + group.name)
         group_receieved = group
 
-    # get the user information
-    pagination_item = server.groups.populate_users(group_receieved)
+    # 3. Get User
+    all_users, pagination_item = server.users.get(req_group_by_user_name)
+    for user in all_users:
+        print('User Name : ' + user.name)
+        user_receieved = user
 
-
-    # print the names of the users
-    for user in group_receieved.users :
-        print('Group Users : ' + user.name)
-
-
+    # 4. Add user to the group
     server.groups.add_user(group_receieved, user_receieved.id)
     print('User added to group successfully')
+
+    # 5. Remove user from the group
     #server.groups.remove_user(group_receieved, user_receieved.id)
     #print('User removed from the group successfully')
+
     server.auth.sign_out()
