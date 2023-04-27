@@ -59,7 +59,6 @@ with server.auth.sign_in(tableau_auth):
     print("Image saved as " + filename)
 
     # 6. Add Filter
-    option_factory = getattr(TSC, "PDFRequestOptions")
     options = option_factory().vf(filter_key_2,filter_value_2)
 
     server.views.populate_pdf(view_retrieved,options)
