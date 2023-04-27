@@ -48,6 +48,8 @@ req.raise_for_status()
 # Get the response
 response = json.loads(req.content)
 
+print(response)
+
 # Get the authentication token from the credentials element
 token = response["credentials"]["token"]
 

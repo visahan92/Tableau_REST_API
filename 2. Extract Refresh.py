@@ -63,4 +63,5 @@ with server.auth.sign_in(tableau_auth):
 
 
     print(job_data)
+    
     server.auth.sign_out()

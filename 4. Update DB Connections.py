@@ -44,26 +44,12 @@ with server.auth.sign_in(tableau_auth):
     
     update_function = endpoint.update_connection
 
-    # 4. Get Resource
-    resource = endpoint.get_by_id(datasource_receieved.id)
-
-    endpoint.populate_connections(resource)
-
-    # 5. Get connection
+    # 4. Get connection
     connection_receieved = ''
     for connection in datasource_receieved.connections:
         connection_receieved = connection
 
-    
-    connections = list(filter(lambda x: x.id == connection_receieved.id, resource.connections))
-    
-    # 6. Update Connection information
-
-    connection_receieved = ''
-    for connection in connections:
-        connection_receieved = connection
-
-    connection = connection_receieved
+    # 5. Update Credentials
     connection.username = new_db_username
     connection.password = current_db_password
     connection.embed_password = True
